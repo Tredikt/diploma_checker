@@ -28,10 +28,11 @@ def create_app() -> FastAPI:
   register_cors_middleware(application, settings)
   register_request_context_middleware(application)
 
+
   application.include_router(health_router)
-  application.include_router(auth_router)
-  application.include_router(university_router)
-  application.include_router(hr_router)
+  application.include_router(auth_router, prefix="/api/v1")
+  application.include_router(university_router, prefix="/api/v1")
+  application.include_router(hr_router, prefix="/api/v1")
   application.openapi = _build_custom_openapi(application)
 
   register_exception_handlers(application)
@@ -48,8 +49,8 @@ def _build_custom_openapi(application: FastAPI) -> Callable[[], dict[str, Any]]:
       version=application.version,
       routes=application.routes,
     )
-    openapi_schema["paths"]["/hr/verify/{token}"]["get"]["security"] = []
-    openapi_schema["paths"]["/hr/search"]["post"]["security"] = [{"ApiKeyAuth": []}, {"BearerAuth": []}]
+    openapi_schema["paths"]["/api/v1/hr/verify/{token}"]["get"]["security"] = []
+    openapi_schema["paths"]["/api/v1/hr/search"]["post"]["security"] = [{"ApiKeyAuth": []}, {"BearerAuth": []}]
     application.openapi_schema = openapi_schema
     return openapi_schema
 
