@@ -4,7 +4,6 @@ import base64
 import hashlib
 import hmac
 import os
-from typing import cast
 
 import bcrypt
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM

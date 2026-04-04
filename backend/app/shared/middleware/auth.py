@@ -11,8 +11,8 @@ from app.shared.errors import AppError
 from app.shared.jwt_utils import decode_access_token
 from app.shared.types.auth import UserTypeEnum
 
-
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 
 @dataclass(slots=True)
@@ -24,7 +24,9 @@ class CurrentUser:
 async def get_current_user(
   credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ) -> CurrentUser:
-  token = credentials.credentials
+  return resolve_current_user_from_token(credentials.credentials)
+
+def resolve_current_user_from_token(token: str) -> CurrentUser:
   try:
     payload = decode_access_token(token)
   except jwt.PyJWTError as exc:
@@ -41,6 +43,14 @@ async def get_current_user(
     raise AppError(status_code=401, error_code="UNAUTHORIZED", detail="Invalid token claims") from exc
 
   return CurrentUser(user_id=user_id, user_type=enum_user_type)
+
+
+async def get_current_user_optional(
+  credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(optional_security)],
+) -> CurrentUser | None:
+  if credentials is None:
+    return None
+  return resolve_current_user_from_token(credentials.credentials)
 
 
 def require_company(

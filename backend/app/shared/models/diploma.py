@@ -26,5 +26,9 @@ class Diploma(Base):
   diploma_number_hash: Mapped[str] = mapped_column(String(255), nullable=False)
   encrypted_payload: Mapped[str] = mapped_column(Text, nullable=False)
   digital_signature: Mapped[str] = mapped_column(Text, nullable=False)
-  status: Mapped[str] = mapped_column(ENUM("VALID", "REVOKED", name="diploma_status", create_type=True), nullable=False, default="VALID")
+  status: Mapped[str] = mapped_column(
+    ENUM("VALID", "REVOKED", name="diploma_status", create_type=True),
+    nullable=False,
+    default="VALID",
+  )
   created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
