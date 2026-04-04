@@ -11,7 +11,6 @@ from app.shared.errors import AppError
 from app.shared.jwt_utils import decode_access_token
 from app.shared.types.auth import UserTypeEnum
 
-
 security = HTTPBearer()
 
 
@@ -48,4 +47,12 @@ def require_company(
 ) -> CurrentUser:
   if user.user_type is not UserTypeEnum.COMPANY:
     raise AppError(status_code=403, error_code="FORBIDDEN", detail="Company role required")
+  return user
+
+
+def require_university(
+  user: Annotated[CurrentUser, Depends(get_current_user)],
+) -> CurrentUser:
+  if user.user_type is not UserTypeEnum.UNIVERSITY:
+    raise AppError(status_code=403, error_code="FORBIDDEN", detail="University role required")
   return user

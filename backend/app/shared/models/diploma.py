@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, Text, UniqueConstraint, func
+from sqlalchemy import DateTime, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import ENUM, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -14,6 +14,7 @@ class Diploma(Base):
   __tablename__ = "diplomas"
   __table_args__ = (
     UniqueConstraint("university_id", "diploma_number_hash", name="uq_university_diploma_number"),
+    UniqueConstraint("verification_hash", name="uq_diplomas_verification_hash"),
     {"schema": "core"},
   )
 
@@ -23,8 +24,15 @@ class Diploma(Base):
   last_name_hash: Mapped[str] = mapped_column(String(255), nullable=False)
   first_name_hash: Mapped[str] = mapped_column(String(255), nullable=False)
   patronymic_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+  graduation_year: Mapped[int] = mapped_column(Integer, nullable=False)
+  specialty_hash: Mapped[str] = mapped_column(String(255), nullable=False)
   diploma_number_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+  verification_hash: Mapped[str] = mapped_column(String(64), nullable=False)
   encrypted_payload: Mapped[str] = mapped_column(Text, nullable=False)
   digital_signature: Mapped[str] = mapped_column(Text, nullable=False)
-  status: Mapped[str] = mapped_column(ENUM("VALID", "REVOKED", name="diploma_status", create_type=True), nullable=False, default="VALID")
+  status: Mapped[str] = mapped_column(
+    ENUM("VALID", "REVOKED", name="diploma_status", schema="core", create_type=False),
+    nullable=False,
+    default="VALID",
+  )
   created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

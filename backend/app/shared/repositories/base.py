@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import builtins
 from collections.abc import Mapping, Sequence
-from typing import Any, TypeVar
+from typing import Any, Generic, TypeVar
 
 from sqlalchemy import Select, func, select, update
 from sqlalchemy.engine import CursorResult
@@ -16,7 +16,7 @@ FilterExpression = ColumnElement[bool] | BinaryExpression[bool]
 OrderExpression = ColumnElement[Any]
 
 
-class BaseRepository[ModelT]:
+class BaseRepository(Generic[ModelT]):
   def __init__(self, session: AsyncSession, model: type[ModelT]) -> None:
     self.session = session
     self.model = model

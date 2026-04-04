@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import logging
 import time
 from uuid import uuid4
 
-import structlog
 from fastapi import FastAPI, Request
 
-logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def register_request_context_middleware(app: FastAPI) -> None:
@@ -21,11 +21,11 @@ def register_request_context_middleware(app: FastAPI) -> None:
 
     response.headers["X-Request-ID"] = request_id
     logger.info(
-      "request_processed",
-      request_id=request_id,
-      method=request.method,
-      path=request.url.path,
-      status_code=response.status_code,
-      duration_ms=round(duration_ms, 2),
+      "request_processed id=%s method=%s path=%s status=%s duration_ms=%.2f",
+      request_id,
+      request.method,
+      request.url.path,
+      response.status_code,
+      duration_ms,
     )
     return response
