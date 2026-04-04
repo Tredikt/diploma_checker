@@ -7,7 +7,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSessionStore } from '@/app/store/session-store'
 import { getMyProfile, login } from '@/features/auth/api/auth-api'
 import { loginSchema, type LoginFormValues } from '@/features/auth/model/auth-forms'
-import { roleDescriptions, roleLabels } from '@/features/auth/model/auth-config'
+import { roleActionLabels } from '@/features/auth/model/auth-config'
 import { getApiErrorMessage, ApiError } from '@/shared/api/http-client'
 import { getRoleHomePath, isPathAllowedForRole } from '@/shared/lib/role-routing'
 import { FormField } from '@/shared/ui/forms/FormField'
@@ -95,14 +95,20 @@ export function LoginPage() {
   })
 
   return (
-    <AuthRoutePanel eyebrow="Login" title="Единая точка входа" description={roleDescriptions[role]} footer="Выбранная роль определяет контракт входа и маршрут после авторизации. Данные формы сохраняются даже при ошибке сервера.">
+    <AuthRoutePanel
+      eyebrow="Login"
+      title="Единая точка входа"
+      description=""
+      actions={
+        <>
+          <span>Нет аккаунта?</span>
+          <Link className="font-semibold text-[var(--accent)]" to={`/auth/register/${role}`}>
+            Регистрация {roleActionLabels[role]}
+          </Link>
+        </>
+      }
+    >
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="rounded-[24px] border border-[var(--line-subtle)] bg-white/55 p-5">
-          <p className="text-sm leading-6 text-[var(--text-secondary)]">
-            Вход для роли <span className="font-semibold text-[var(--text-primary)]">{roleLabels[role]}</span>. Для организаций неподтверждённый аккаунт будет переведён в сценарий ожидания проверки.
-          </p>
-        </div>
-
         <FormField
           autoComplete="email"
           error={form.formState.errors.email?.message}
@@ -130,13 +136,6 @@ export function LoginPage() {
           {loginMutation.isPending ? 'Входим в систему...' : 'Войти'}
         </button>
       </form>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
-        <span>Нет аккаунта?</span>
-        <Link className="font-semibold text-[var(--accent)]" to={`/auth/register/${role}`}>
-          Зарегистрироваться как {roleLabels[role]}
-        </Link>
-      </div>
     </AuthRoutePanel>
   )
 }

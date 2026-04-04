@@ -13,18 +13,16 @@ import {
   type StudentRegistrationFormValues,
   type UniversityRegistrationFormValues,
 } from '@/features/auth/model/auth-forms'
-import { roleDescriptions, roleLabels } from '@/features/auth/model/auth-config'
+import { roleActionLabels } from '@/features/auth/model/auth-config'
 import { getApiErrorMessage } from '@/shared/api/http-client'
 import { FormField } from '@/shared/ui/forms/FormField'
 import { FormMessage } from '@/shared/ui/forms/FormMessage'
-
 import { AuthRoutePanel } from '@/widgets/auth-panels/AuthRoutePanel'
 
 export function RegisterPage() {
   const navigate = useNavigate()
   const { role: roleParam = 'student' } = useParams()
   const role = roleParam === 'university' || roleParam === 'company' || roleParam === 'student' ? roleParam : 'student'
-  const description = roleDescriptions[role]
   const [formError, setFormError] = useState<string | null>(null)
 
   const universityForm = useForm<UniversityRegistrationFormValues>({
@@ -110,14 +108,26 @@ export function RegisterPage() {
   })
 
   return (
-    <AuthRoutePanel eyebrow="Registration" title={`Регистрация: ${roleLabels[role]}`} description={description} footer="Форма адаптируется под выбранную роль, но остаётся в одном визуальном контуре. После отправки мы ведём в success state без автологина.">
+    <AuthRoutePanel
+      eyebrow="Registration"
+      title={`Регистрация ${roleActionLabels[role]}`}
+      description=""
+      actions={
+        <>
+          <span>Аккаунт уже существует?</span>
+          <Link className="font-semibold text-[var(--accent)]" to="/auth/login">
+            Вернуться ко входу
+          </Link>
+        </>
+      }
+    >
       {role === 'university' ? (
         <form className="space-y-4" onSubmit={handleUniversitySubmit}>
           <FormField error={universityForm.formState.errors.code?.message} label="Код ВУЗа" placeholder="MGU-01" {...universityForm.register('code')} />
           <FormField error={universityForm.formState.errors.name?.message} label="Название" placeholder="МГУ" {...universityForm.register('name')} />
           <FormField autoComplete="email" error={universityForm.formState.errors.email?.message} label="Email" placeholder="admin@university.ru" {...universityForm.register('email')} />
           <FormField autoComplete="new-password" error={universityForm.formState.errors.password?.message} label="Пароль" placeholder="Минимум 8 символов" type="password" {...universityForm.register('password')} />
-          <FormField error={universityForm.formState.errors.public_key?.message} hint="Необязательное поле. Можно оставить пустым на MVP." label="Публичный ключ" placeholder="-----BEGIN PUBLIC KEY-----" {...universityForm.register('public_key')} />
+          <FormField error={universityForm.formState.errors.public_key?.message} label="Публичный ключ" placeholder="-----BEGIN PUBLIC KEY-----" {...universityForm.register('public_key')} />
           {formError ? <FormMessage message={formError} tone="error" /> : null}
           <button className="w-full rounded-full bg-[var(--bg-ink)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--bg-ink-soft)] disabled:cursor-not-allowed disabled:opacity-70" disabled={registrationMutation.isPending} type="submit">
             {registrationMutation.isPending ? 'Отправляем заявку...' : 'Зарегистрировать ВУЗ'}
@@ -145,7 +155,7 @@ export function RegisterPage() {
             <FormField error={studentForm.formState.errors.last_name?.message} label="Фамилия" placeholder="Иванов" {...studentForm.register('last_name')} />
             <FormField error={studentForm.formState.errors.first_name?.message} label="Имя" placeholder="Иван" {...studentForm.register('first_name')} />
           </div>
-          <FormField error={studentForm.formState.errors.patronymic?.message} hint="Необязательное поле." label="Отчество" placeholder="Иванович" {...studentForm.register('patronymic')} />
+          <FormField error={studentForm.formState.errors.patronymic?.message} label="Отчество" placeholder="Иванович" {...studentForm.register('patronymic')} />
           <FormField error={studentForm.formState.errors.diploma_number?.message} label="Номер диплома" placeholder="ABC-12345" {...studentForm.register('diploma_number')} />
           {formError ? <FormMessage message={formError} tone="error" /> : null}
           <button className="w-full rounded-full bg-[var(--bg-ink)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--bg-ink-soft)] disabled:cursor-not-allowed disabled:opacity-70" disabled={registrationMutation.isPending} type="submit">
@@ -153,13 +163,6 @@ export function RegisterPage() {
           </button>
         </form>
       ) : null}
-
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
-        <span>Аккаунт уже существует?</span>
-        <Link className="font-semibold text-[var(--accent)]" to="/auth/login">
-          Вернуться ко входу
-        </Link>
-      </div>
     </AuthRoutePanel>
   )
 }

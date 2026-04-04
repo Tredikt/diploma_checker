@@ -6,6 +6,12 @@ export const roleLabels: Record<UserRole, string> = {
   company: 'HR',
 }
 
+export const roleActionLabels: Record<UserRole, string> = {
+  university: 'ВУЗа',
+  student: 'студента',
+  company: 'компании',
+}
+
 export const roleNames: Record<UserRole, string> = {
   university: 'университета',
   student: 'студента',
@@ -13,12 +19,12 @@ export const roleNames: Record<UserRole, string> = {
 }
 
 export const roleDescriptions: Record<UserRole, string> = {
-  university: 'Работа с реестром дипломов, импортом и статусами записей.',
-  student: 'Личный вход в систему и дальнейший доступ к студенческому контуру.',
-  company: 'Ручная проверка дипломов и интеграционные сценарии для HR-команды.',
+  university: '',
+  student: '',
+  company: '',
 }
 
 export const rolePendingDescriptions: Record<Exclude<UserRole, 'student'>, string> = {
-  university: 'Организация зарегистрирована, но доступ к кабинету откроется только после подтверждения администратором.',
-  company: 'Компания отправлена на проверку. После подтверждения появится доступ к ручной верификации и API.',
+  university: 'Организация зарегистрирована. Доступ к кабинету откроется после подтверждения со стороны администратора.',
+  company: 'Компания принята в обработку. После подтверждения откроется доступ к ручной верификации и API.',
 }

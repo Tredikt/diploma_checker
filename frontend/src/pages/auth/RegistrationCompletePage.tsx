@@ -16,32 +16,22 @@ export function RegistrationCompletePage() {
   return (
     <div className="space-y-6">
       <PageSection
-        eyebrow="Success State"
+        eyebrow="Registration Complete"
         title="Регистрация принята"
         description={
           isStudentReady
-            ? 'Аккаунт студента создан и уже подтверждён. Можно сразу перейти ко входу и открыть студенческий контур.'
+            ? 'Аккаунт студента создан и готов к следующему входу в систему.'
             : role === 'student'
-              ? 'Аккаунт создан. Следующим шагом можно вернуться ко входу и авторизоваться в системе.'
+              ? 'Данные сохранены. Следующим шагом можно вернуться ко входу и авторизоваться в системе.'
               : rolePendingDescriptions[role as 'university' | 'company']
         }
-        aside={
-          <InfoCard
-            label="Role"
-            title={roleLabels[role]}
-            description={response?.message ?? 'Результат регистрации сохранён. Дальше пользователь может перейти к авторизации или дождаться подтверждения.'}
-            tone={isStudentReady ? 'accent' : 'warning'}
-          />
-        }
+        aside={<InfoCard label="Статус" title={roleLabels[role]} description={response?.message ?? 'Регистрация сохранена.'} tone={isStudentReady ? 'accent' : 'warning'} />}
       >
         {response?.message ? <FormMessage message={response.message} tone={isStudentReady ? 'success' : 'info'} /> : null}
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link className="rounded-full bg-[var(--bg-ink)] px-5 py-3 text-sm font-semibold text-white" to="/auth/login">
             Перейти ко входу
-          </Link>
-          <Link className="rounded-full border border-[var(--line-strong)] px-5 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-white/70" to="/verify">
-            Открыть публичную проверку
           </Link>
         </div>
       </PageSection>
