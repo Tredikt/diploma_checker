@@ -6,20 +6,22 @@ import hmac
 import os
 from typing import cast
 
+import bcrypt
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from passlib.context import CryptContext
 
 from app.config import get_settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def hash_password(password: str) -> str:
-  return cast(str, pwd_context.hash(password))
+  salt = bcrypt.gensalt()
+  return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
 
 def verify_password(password: str, password_hash: str) -> bool:
-  return cast(bool, pwd_context.verify(password, password_hash))
+  try:
+    return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
+  except ValueError:
+    return False
 
 
 def compute_hmac(value: str) -> str:

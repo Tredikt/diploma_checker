@@ -4,11 +4,15 @@ from dataclasses import dataclass
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, Header
+from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.shared.errors import AppError
 from app.shared.jwt_utils import decode_access_token
 from app.shared.types.auth import UserTypeEnum
+
+
+security = HTTPBearer()
 
 
 @dataclass(slots=True)
@@ -17,21 +21,10 @@ class CurrentUser:
   user_type: UserTypeEnum
 
 
-def _parse_authorization_header(authorization: str | None) -> str:
-  if authorization is None:
-    raise AppError(status_code=401, error_code="UNAUTHORIZED", detail="Missing bearer token")
-
-  prefix = "Bearer "
-  if not authorization.startswith(prefix):
-    raise AppError(status_code=401, error_code="UNAUTHORIZED", detail="Invalid auth scheme")
-
-  return authorization[len(prefix) :]
-
-
 async def get_current_user(
-  authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+  credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ) -> CurrentUser:
-  token = _parse_authorization_header(authorization)
+  token = credentials.credentials
   try:
     payload = decode_access_token(token)
   except jwt.PyJWTError as exc:

@@ -20,6 +20,6 @@ class CompanyLimitRepository(BaseRepository[CompanyLimit]):
 
     return await self.create(
       company_id=company_id,
-      monthly_quota=get_settings().default_monthly_quota,
+      monthly_quota=get_settings().company_monthly_quota,
       current_month_usage=0,
     )
