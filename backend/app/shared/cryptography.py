@@ -57,6 +57,10 @@ def decrypt_aes(value: str) -> str:
   return plaintext.decode("utf-8")
 
 
+# NIST P-256 (SECP256R1) curve order n — не все версии cryptography expose `.order` на классе кривой.
+_SECP256R1_ORDER = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
+
+
 def derive_university_signing_private_key(university_id: uuid.UUID) -> ec.EllipticCurvePrivateKey:
   settings = get_settings()
   seed = hmac.new(
@@ -65,8 +69,7 @@ def derive_university_signing_private_key(university_id: uuid.UUID) -> ec.Ellipt
     hashlib.sha256,
   ).digest()
   curve = ec.SECP256R1()
-  order = curve.order
-  private_int = int.from_bytes(seed, "big") % (order - 1) + 1
+  private_int = int.from_bytes(seed, "big") % (_SECP256R1_ORDER - 1) + 1
   return ec.derive_private_key(private_int, curve)
 
 

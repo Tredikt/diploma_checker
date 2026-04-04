@@ -31,7 +31,7 @@ class Diploma(Base):
   encrypted_payload: Mapped[str] = mapped_column(Text, nullable=False)
   digital_signature: Mapped[str] = mapped_column(Text, nullable=False)
   status: Mapped[str] = mapped_column(
-    ENUM("VALID", "REVOKED", name="diploma_status", create_type=True),
+    ENUM("VALID", "REVOKED", name="diploma_status", schema="core", create_type=False),
     nullable=False,
     default="VALID",
   )
