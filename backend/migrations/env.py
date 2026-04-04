@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.config import get_settings
 
 from app.modules.auth import models as auth_models
+from app.modules.student import models as student_models
 from app.shared.database import Base
 
 config = context.config
