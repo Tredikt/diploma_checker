@@ -5,8 +5,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, File, Query, UploadFile
 
-from app.modules.auth.routers.deps import DbSessionDep, RedisDep
-from app.modules.university.routers.deps import UniversityUserDep
+from app.modules.university.routers.deps import DbSessionDep, RedisDep, UniversityUserDep
 from app.modules.university.schemas import (
   DiplomaCreatedResponse,
   DiplomaCreateRequest,
