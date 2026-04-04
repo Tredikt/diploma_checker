@@ -4,9 +4,9 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.modules.auth.models import CompanyLimit
 from app.shared.repositories import BaseRepository
-from app.config import get_settings
 
 
 class CompanyLimitRepository(BaseRepository[CompanyLimit]):
