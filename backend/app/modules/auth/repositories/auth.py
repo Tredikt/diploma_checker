@@ -83,5 +83,14 @@ class AuthRepository:
   async def deactivate_api_key(self, company_id: uuid.UUID, key_id: uuid.UUID) -> bool:
     return await self.api_keys.deactivate_api_key(company_id, key_id)
 
+  async def get_active_api_key_by_hash(self, key_hash: str) -> ApiKey | None:
+    return await self.api_keys.get_active_api_key_by_hash(key_hash)
+
+  async def mark_api_key_used(self, key_id: uuid.UUID) -> bool:
+    return await self.api_keys.mark_used(key_id)
+
   async def get_or_create_company_limit(self, company_id: uuid.UUID) -> CompanyLimit:
     return await self.limits.get_or_create_company_limit(company_id)
+
+  async def increment_company_usage(self, company_id: uuid.UUID) -> CompanyLimit:
+    return await self.limits.increment_company_usage(company_id)
