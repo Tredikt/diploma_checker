@@ -30,6 +30,8 @@ class Settings(BaseSettings):
   cors_origins: list[str] = Field(default_factory=list, alias="CORS_ORIGINS")
   public_rate_limit_per_minute: int = Field(default=20, alias="PUBLIC_RATE_LIMIT_PER_MINUTE")
   b2b_rate_limit_per_minute: int = Field(default=100, alias="B2B_RATE_LIMIT_PER_MINUTE")
+  
+  companty_monthly_quota: int = Field(default=1000, alias="COMPANY_MONTHLY_QUOTA")
 
   @field_validator("jwt_secret_key", "hmac_secret_key")
   @classmethod
