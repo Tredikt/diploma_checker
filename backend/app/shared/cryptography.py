@@ -4,9 +4,11 @@ import base64
 import hashlib
 import hmac
 import os
-from typing import cast
+import uuid
 
 import bcrypt
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from app.config import get_settings
@@ -53,3 +55,32 @@ def decrypt_aes(value: str) -> str:
   aesgcm = AESGCM(settings.aes_key_bytes)
   plaintext = aesgcm.decrypt(nonce, ciphertext, None)
   return plaintext.decode("utf-8")
+
+
+def derive_university_signing_private_key(university_id: uuid.UUID) -> ec.EllipticCurvePrivateKey:
+  settings = get_settings()
+  seed = hmac.new(
+    settings.hmac_secret_key.encode("utf-8"),
+    str(university_id).encode("utf-8"),
+    hashlib.sha256,
+  ).digest()
+  curve = ec.SECP256R1()
+  order = curve.order
+  private_int = int.from_bytes(seed, "big") % (order - 1) + 1
+  return ec.derive_private_key(private_int, curve)
+
+
+def university_signing_public_key_pem(university_id: uuid.UUID) -> str:
+  private_key = derive_university_signing_private_key(university_id)
+  public_key = private_key.public_key()
+  pem = public_key.public_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PublicFormat.SubjectPublicKeyInfo,
+  )
+  return pem.decode("utf-8")
+
+
+def sign_diploma_payload(message: bytes, university_id: uuid.UUID) -> str:
+  private_key = derive_university_signing_private_key(university_id)
+  signature = private_key.sign(message, ec.ECDSA(hashes.SHA256()))
+  return base64.b64encode(signature).decode("utf-8")
