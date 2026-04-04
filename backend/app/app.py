@@ -8,6 +8,7 @@ from fastapi.openapi.utils import get_openapi
 
 from app.config import get_settings
 from app.modules.auth.routers import router as auth_router
+from app.modules.university.routers import router as university_router
 from app.modules.hr.routers import router as hr_router
 from app.shared.bootstrap import lifespan
 from app.shared.middleware import register_cors_middleware, register_request_context_middleware
@@ -29,6 +30,7 @@ def create_app() -> FastAPI:
 
   application.include_router(health_router)
   application.include_router(auth_router)
+  application.include_router(university_router)
   application.include_router(hr_router)
   application.openapi = _build_custom_openapi(application)
 
