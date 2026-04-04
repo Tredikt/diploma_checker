@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import uuid
+from datetime import UTC, datetime
 
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.auth.models import ApiKey
@@ -36,3 +38,15 @@ class ApiKeyRepository(BaseRepository[ApiKey]):
       values={"is_active": False},
     )
     return updated > 0
+
+  async def get_active_api_key_by_hash(self, key_hash: str) -> ApiKey | None:
+    return await self.get_one(filters={"key_hash": key_hash, "is_active": True})
+
+  async def mark_used(self, key_id: uuid.UUID) -> bool:
+    result = await self.session.execute(
+      update(ApiKey)
+      .where(ApiKey.id == key_id)
+      .values(last_used_at=datetime.now(UTC))
+    )
+    rowcount = getattr(result, "rowcount", None)
+    return bool(rowcount and rowcount > 0)

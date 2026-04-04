@@ -4,7 +4,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from app.modules.hr.dependencies import (
+from app.modules.hr.routers.deps import (
   HrCallerContextDep,
   HrVerificationServiceDep,
   search_rate_limit_dependency,
