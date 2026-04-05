@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 
+import { roleLabels } from '@/features/auth/model/auth-config'
 import { getNavigationForRole } from '@/shared/config/navigation'
 import type { UserRole } from '@/shared/types/auth'
 
@@ -18,7 +19,7 @@ export function SidebarNav({ role }: SidebarNavProps) {
           <p className="mt-2 text-sm text-[var(--text-secondary)]">Разделы рабочего контура</p>
         </div>
         <div className="rounded-full border border-[var(--line-subtle)] bg-white/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
-          ВУЗ
+          {role ? roleLabels[role] : 'Роль'}
         </div>
       </div>
       <div className="mt-5 space-y-3">
