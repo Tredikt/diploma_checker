@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from uuid import UUID
-
 from fastapi import APIRouter, Depends
 
 from app.modules.hr.routers.deps import (
@@ -22,11 +20,11 @@ router = APIRouter()
   openapi_extra={"security": []},
 )
 async def verify_qr_token(
-  token: UUID,
+  token: str,
   service: HrVerificationServiceDep,
   caller_context: HrCallerContextDep,
 ) -> VerificationResult:
-  return await service.verify_qr_token(token=str(token), caller_context=caller_context)
+  return await service.verify_qr_token(token=token, caller_context=caller_context)
 
 
 @router.post(

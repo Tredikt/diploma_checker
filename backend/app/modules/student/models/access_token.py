@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, func, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -12,7 +12,14 @@ from app.shared.database import Base
 
 class AccessToken(Base):
   __tablename__ = "access_tokens"
-  __table_args__ = {"schema": "core"}
+  __table_args__ = (
+    Index(
+      "idx_core_access_tokens_val",
+      "token_value",
+      postgresql_where=text("is_revoked = false"),
+    ),
+    {"schema": "core"},
+  )
 
   id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
   diploma_id: Mapped[uuid.UUID] = mapped_column(

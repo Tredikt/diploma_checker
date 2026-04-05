@@ -16,6 +16,7 @@ class ApiKeyResponse(BaseModel):
   key: str | None = None
   is_active: bool
   created_at: datetime
+  last_used_at: datetime | None = None
 
 
 class ApiKeyList(BaseModel):

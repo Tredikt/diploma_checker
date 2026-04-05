@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class DecryptedDiplomaPayload:
   full_name: str
   specialty: str
-  issue_year: int
+  year: int
   diploma_number: str
 
 
@@ -34,7 +34,7 @@ class HrVerificationPresenter:
         university_name=diploma.university_name,
         full_name=payload.full_name,
         specialty=payload.specialty,
-        issue_year=payload.issue_year,
+        issue_year=payload.year,
         diploma_number=payload.diploma_number,
       )
     else:
@@ -43,7 +43,7 @@ class HrVerificationPresenter:
         university_name=diploma.university_name,
         full_name_masked=self._mask_full_name(payload.full_name),
         specialty=payload.specialty,
-        issue_year=payload.issue_year,
+        issue_year=payload.year,
       )
 
     is_valid = diploma.is_valid
@@ -65,7 +65,7 @@ class HrVerificationPresenter:
     return DecryptedDiplomaPayload(
       full_name=str(parsed.get("full_name", "")).strip(),
       specialty=str(parsed.get("specialty", "")).strip(),
-      issue_year=int(parsed.get("issue_year", 0)),
+      year=int(parsed.get("year", parsed.get("issue_year", 0))),
       diploma_number=str(parsed.get("diploma_number", "")).strip(),
     )
 

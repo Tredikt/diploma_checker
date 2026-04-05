@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, Response
+from fastapi import APIRouter, Depends, Response, Security
+from fastapi.security import APIKeyCookie
 
+from app.config import get_settings
 from app.modules.auth.routers.deps import DbSessionDep, RedisDep
 from app.modules.auth.schemas import (
   CompanyRegistrationRequest,
@@ -19,16 +21,19 @@ from app.shared.errors import AppError
 from app.shared.middleware.rate_limiter import public_rate_limit
 
 router = APIRouter(dependencies=[Depends(public_rate_limit)])
+refresh_cookie_scheme = APIKeyCookie(name="refresh_token", auto_error=False)
 
 
 def _set_refresh_cookie(response: Response, refresh_token: str, max_age: int) -> None:
+  settings = get_settings()
+  secure_cookie = settings.app_env == "production"
   response.set_cookie(
     key="refresh_token",
     value=refresh_token,
     httponly=True,
-    secure=True,
-    samesite="lax",
-    path="/auth/refresh",
+    secure=secure_cookie,
+    samesite="none" if secure_cookie else "lax",
+    path="/",
     max_age=max_age,
   )
 
@@ -89,7 +94,7 @@ async def refresh(
   response: Response,
   session: DbSessionDep,
   redis: RedisDep,
-  refresh_token: Annotated[str | None, Cookie(alias="refresh_token")] = None,
+  refresh_token: Annotated[str | None, Security(refresh_cookie_scheme)] = None,
 ) -> RefreshResponse:
   if refresh_token is None:
     raise AppError(status_code=401, error_code="UNAUTHORIZED", detail="Missing refresh token cookie")

@@ -10,7 +10,7 @@ from tests.support import register_and_verify_university, university_access_head
 
 async def test_university_diplomas_requires_auth(client: AsyncClient) -> None:
   response = await client.get("/university/diplomas")
-  assert response.status_code == 403
+  assert response.status_code == 401
 
 
 async def test_university_create_list_get_revoke_import(
