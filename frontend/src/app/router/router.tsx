@@ -160,6 +160,34 @@ export const appRouter = createBrowserRouter([
               return { Component: module.StudentHomePage }
             },
           },
+          {
+            path: 'diplomas',
+            lazy: async () => {
+              const module = await import('@/pages/student/StudentDiplomaListPage')
+              return { Component: module.StudentDiplomaListPage }
+            },
+          },
+          {
+            path: 'diplomas/:diplomaId',
+            lazy: async () => {
+              const module = await import('@/pages/student/StudentDiplomaDetailPage')
+              return { Component: module.StudentDiplomaDetailPage }
+            },
+          },
+          {
+            path: 'diplomas/:diplomaId/access',
+            lazy: async () => {
+              const module = await import('@/pages/student/StudentAccessManagementPage')
+              return { Component: module.StudentAccessManagementPage }
+            },
+          },
+          {
+            path: 'diplomas/:diplomaId/access/:tokenId/qr',
+            lazy: async () => {
+              const module = await import('@/pages/student/StudentAccessTokenQrPage')
+              return { Component: module.StudentAccessTokenQrPage }
+            },
+          },
         ],
       },
     ],

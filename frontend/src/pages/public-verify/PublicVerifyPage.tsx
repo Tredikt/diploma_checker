@@ -21,7 +21,8 @@ function isMaskedPayload(
 export function PublicVerifyPage() {
   const { token } = useParams()
   const hasToken = Boolean(token)
-  const isMalformedToken = Boolean(token) && !uuidPattern.test(token ?? '')
+  // Мы больше не проверяем на uuidPattern, так как новый формат токенов - строка (base64url)
+  const isMalformedToken = false
   const verifyQuery = useQuery({
     queryKey: ['public-verification', token],
     queryFn: () => verifyPublicDiploma(token ?? ''),
@@ -29,6 +30,8 @@ export function PublicVerifyPage() {
     retry: false,
     staleTime: 0,
   })
+
+  console.log(verifyQuery)
 
   if (!hasToken) {
     return (
