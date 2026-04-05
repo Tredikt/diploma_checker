@@ -171,6 +171,16 @@ uv run mypy app
 
 ## Как пользоваться backend
 
+| Tag | Скрин |
+|---|---|
+| auth | ![ВУЗ login](demo/screens/auth.png) |
+| university | ![ВУЗ register](demo/screens/university.png) |
+| student | ![ВУЗ diploms](demo/screens/student.png) |
+| hr | ![ВУЗ import](demo/screens/hr.png) |
+
+OpenAPI - json спецификация для API:
+`/demo/openapi.json`
+
 ### Пример локального сценария
 
 1. ВУЗ создает записи дипломов через `/api/v1/university/...`
@@ -178,7 +188,6 @@ uv run mypy app
 3. HR выполняет ручной поиск через `/api/v1/hr/search`
 4. Публичная ссылка ведет на `/api/v1/hr/verify/{token}`
 
-OpenAPI строится внутри приложения, а в репозитории также лежат дополнительные спецификации и экспортированные схемы в `specs/` и `frontend/docs/openapi*.json`.
 
 ## Команда
 
@@ -186,9 +195,4 @@ OpenAPI строится внутри приложения, а в репозит
 - Степан Кузьменко - Backend Developer
 - Владислав Петлюк - Fullstack Developer
 
-## Demo и ссылки
-
-- `API demo`: placeholder, будет добавлено позже
-- `OpenAPI screenshots`: placeholder, будут добавлены позже
-- `Deploy link`: placeholder, будет добавлена позже
 
