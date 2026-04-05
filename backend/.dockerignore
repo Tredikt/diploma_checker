@@ -15,4 +15,4 @@ tests
 specs
 *.md
 !README.md
-uv.lock
+!uv.lock

@@ -47,7 +47,7 @@ export function AppShell({ children }: PropsWithChildren) {
             <div>
               <div className="eyebrow">Diasoft Verification Workspace</div>
               <div className="mt-2 flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-semibold text-[var(--text-primary)]">Рабочий кабинет</h1>
+                <h1 className="text-2xl font-semibold text-[var(--text-primary)]">Личный кабинет</h1>
                 {role ? (
                   <span className="rounded-full border border-[rgba(196,109,56,0.18)] bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
                     {roleLabels[role]}

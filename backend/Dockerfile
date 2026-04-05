@@ -1,23 +1,46 @@
-FROM python:3.12-slim-bookworm
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS deps
+
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_NO_DEV=1
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock README.md ./
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-install-project
+
+FROM deps AS build
+
+COPY . .
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked
+
+FROM python:3.12-slim-bookworm AS runtime
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libpq5 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system --gid 999 nonroot \
+    && useradd --system --uid 999 --gid 999 --create-home nonroot
 
-COPY pyproject.toml README.md ./
-COPY app ./app
-COPY migrations ./migrations
-COPY alembic.ini main.py ./
+COPY --from=build --chown=nonroot:nonroot /app/.venv /app/.venv
+COPY --from=build --chown=nonroot:nonroot /app/app /app/app
+COPY --from=build --chown=nonroot:nonroot /app/migrations /app/migrations
+COPY --from=build --chown=nonroot:nonroot /app/alembic.ini /app/alembic.ini
 
-RUN pip install --upgrade pip \
-    && pip install .
+USER nonroot
 
 EXPOSE 8000
 

@@ -53,10 +53,10 @@ export const navigationItems: NavigationItem[] = [
     role: 'company',
   },
   {
-    label: 'Студенческий кабинет',
-    shortLabel: 'Кабинет',
-    description: 'Профиль и статус личного контура',
-    to: '/app/student/home',
+    label: 'Мои дипломы',
+    shortLabel: 'Дипломы',
+    description: 'Список записей и переход в деталь',
+    to: '/app/student/diplomas',
     role: 'student',
   },
 ]
