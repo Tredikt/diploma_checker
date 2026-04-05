@@ -140,12 +140,8 @@ async def test_refresh_with_cookie(
   cookies_header = set_cookie_values(login)
   refresh = next((c for c in cookies_header if "refresh_token=" in c), None)
   assert refresh is not None
-  token_part = refresh.split("refresh_token=", 1)[1].split(";", 1)[0]
 
-  refreshed = await client.post(
-    "/auth/refresh",
-    headers={"Cookie": f"refresh_token={token_part}"},
-  )
+  refreshed = await client.post("/auth/refresh")
   assert refreshed.status_code == 200
   refreshed_body = refreshed.json()
   assert refreshed_body["access_token"]
