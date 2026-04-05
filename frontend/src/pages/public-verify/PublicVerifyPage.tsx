@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 
+import { useSessionStore } from '@/app/store/session-store'
 import { verifyPublicDiploma } from '@/features/public-verification/api/public-verification-api'
 import { ApiError } from '@/shared/api/http-client'
 import { InfoCard } from '@/shared/ui/feedback/InfoCard'
@@ -20,13 +21,15 @@ function isMaskedPayload(
 
 export function PublicVerifyPage() {
   const { token } = useParams()
+  const isBootstrapping = useSessionStore((state) => state.isBootstrapping)
+  const isAuthenticated = useSessionStore((state) => state.isAuthenticated)
   const hasToken = Boolean(token)
   // Мы больше не проверяем на uuidPattern, так как новый формат токенов - строка (base64url)
   const isMalformedToken = false
   const verifyQuery = useQuery({
-    queryKey: ['public-verification', token],
+    queryKey: ['public-verification', token, isAuthenticated],
     queryFn: () => verifyPublicDiploma(token ?? ''),
-    enabled: Boolean(token) && !isMalformedToken,
+    enabled: Boolean(token) && !isMalformedToken && !isBootstrapping,
     retry: false,
     staleTime: 0,
   })
@@ -61,7 +64,7 @@ export function PublicVerifyPage() {
     )
   }
 
-  if (verifyQuery.isPending) {
+  if (isBootstrapping || verifyQuery.isPending) {
     return <LoadingState title="Проверяем диплом" description="Сверяем токен и готовим безопасный результат проверки." />
   }
 
@@ -80,7 +83,9 @@ export function PublicVerifyPage() {
   }
 
   const result = verifyQuery.data
-  const maskedData = isMaskedPayload(result.data) ? result.data : null
+  const isMasked = isMaskedPayload(result.data)
+  const isFull = !isMasked
+  const data = result.data
 
   return (
     <div className="shell-page py-6 md:py-10">
@@ -100,35 +105,50 @@ export function PublicVerifyPage() {
         <div className="grid gap-4 lg:grid-cols-[1.4fr_0.8fr]">
           <article className="rounded-[28px] border border-[var(--line-subtle)] bg-white/70 p-6 shadow-[var(--shadow-soft)]">
             <div className="eyebrow">{result.is_valid ? 'Verified' : 'Verification Notice'}</div>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--text-primary)]">{maskedData?.university_name ?? 'Данные проверки ограничены'}</h2>
+            <h2 className="mt-3 text-3xl font-semibold text-[var(--text-primary)]">{data.university_name ?? 'Данные проверки ограничены'}</h2>
             <p className="mt-3 text-base leading-7 text-[var(--text-secondary)]">{result.message}</p>
 
             <dl className="mt-6 grid gap-4 md:grid-cols-2">
               <div className="rounded-[22px] border border-[var(--line-subtle)] bg-[var(--bg-panel-strong)] p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Статус</dt>
-                <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{maskedData?.status ?? 'Недоступно'}</dd>
+                <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{data.status ?? 'Недоступно'}</dd>
               </div>
               <div className="rounded-[22px] border border-[var(--line-subtle)] bg-[var(--bg-panel-strong)] p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Владелец</dt>
-                <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{maskedData?.full_name_masked ?? 'Скрыто'}</dd>
+                <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{isMasked ? (data as DiplomaDataMasked).full_name_masked : (data as DiplomaDataFull).full_name}</dd>
               </div>
               <div className="rounded-[22px] border border-[var(--line-subtle)] bg-[var(--bg-panel-strong)] p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Специальность</dt>
-                <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{maskedData?.specialty ?? 'Недоступно'}</dd>
+                <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{data.specialty ?? 'Недоступно'}</dd>
               </div>
               <div className="rounded-[22px] border border-[var(--line-subtle)] bg-[var(--bg-panel-strong)] p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Год выпуска</dt>
-                <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{maskedData?.issue_year ?? 'Недоступно'}</dd>
+                <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{data.issue_year ?? 'Недоступно'}</dd>
               </div>
+              {isFull && (
+                <div className="rounded-[22px] border border-[var(--line-subtle)] bg-[var(--bg-panel-strong)] p-4">
+                  <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Номер диплома</dt>
+                  <dd className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{(data as DiplomaDataFull).diploma_number ?? 'Недоступно'}</dd>
+                </div>
+              )}
             </dl>
           </article>
 
           <div className="space-y-4">
-            <InfoCard
-              label="Конфиденциальность"
-              title="Публичный режим ограничен"
-              description="Для безопасности диплома здесь не раскрываются полные персональные данные и номер документа."
-            />
+            {isMasked ? (
+              <InfoCard
+                label="Конфиденциальность"
+                title="Публичный режим ограничен"
+                description="Для безопасности диплома здесь не раскрываются полные персональные данные и номер документа."
+              />
+            ) : (
+              <InfoCard
+                label="Доступ разрешен"
+                title="Полные данные"
+                description="Вы авторизованы как HR и видите полную информацию о дипломе."
+                tone="accent"
+              />
+            )}
             <InfoCard label="Источник" title="Проверка по ссылке" description="Если требуется дополнительная сверка, используйте внутренний кабинет организации." />
           </div>
         </div>
