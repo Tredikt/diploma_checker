@@ -56,22 +56,29 @@ npm run dev
 
 ### Вариант 2. Docker
 
-Для backend уже подготовлен `backend/docker-compose.yml` с `PostgreSQL`, `Redis`, миграциями и API-контейнером:
+Для всего стека теперь есть единый корневой `docker-compose.yml`:
 
 ```bash
-cd backend
-cp .env.example .env
+cp .example.env .env
 docker compose up --build
 ```
 
-Корневой `docker-compose.yml` в репозитории тоже присутствует, но для текущего backend-контура более актуальна конфигурация внутри `backend/`.
+Этот сценарий поднимает:
+
+- `postgres`
+- `redis`
+- `migrate` для `alembic upgrade head`
+- `api` с запуском `uvicorn`
+- `frontend` с nginx и проксированием `/api` на backend
+
+После старта интерфейс доступен по `http://localhost:3000`, backend - по `http://localhost:8000`.
 
 ## Структура репозитория
 
 - `frontend/` - клиентская часть, маршруты, UI-компоненты, работа с API и role-based UX.
 - `backend/` - FastAPI-приложение, доменные модули, инфраструктурный слой, миграции и тесты.
-- `Dockerfile` - корневой Dockerfile верхнего уровня репозитория.
-- `docker-compose.yml` - общая docker-compose конфигурация верхнего уровня.
+- `docker-compose.yml` - единая docker-compose конфигурация верхнего уровня.
+- `backend/docker-compose.yml` - backend-only compose для узкого сценария, если он вам нужен отдельно.
 
 Если нужна подробная карта внутреннего устройства:
 
@@ -124,6 +131,7 @@ docker compose up --build
 | Доступы | ![Student access](frontend/demo/student/access.png) |
 | Карточка диплома | ![Student diplom](frontend/demo/student/diplom.png) |
 
+
 ### HR / компания
 
 | Экран | Скрин |
@@ -140,8 +148,3 @@ docker compose up --build
 - Степан Кузьменко - Backend Developer
 - Владислав Петлюк - Fullstack Developer
 
-## Demo и материалы
-
-- `Deploy`: placeholder, ссылка будет добавлена позже
-- `Видео / screencast`: placeholder, ссылка будет добавлена позже
-- `Скриншоты`: placeholder, материалы будут добавлены позже
