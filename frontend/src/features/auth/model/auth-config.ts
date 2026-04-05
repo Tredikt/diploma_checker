@@ -19,9 +19,9 @@ export const roleNames: Record<UserRole, string> = {
 }
 
 export const roleDescriptions: Record<UserRole, string> = {
-  university: '',
-  student: '',
-  company: '',
+  university: 'Реестр, импорт и сопровождение записей.',
+  student: 'Личный контур аккаунта и статус подключения сервисов.',
+  company: 'Ручная верификация, API и лимиты компании.',
 }
 
 export const rolePendingDescriptions: Record<Exclude<UserRole, 'student'>, string> = {

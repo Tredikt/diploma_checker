@@ -136,6 +136,17 @@ export function LoginPage() {
           {loginMutation.isPending ? 'Входим в систему...' : 'Войти'}
         </button>
       </form>
+
+      <div className="mt-5 rounded-[24px] border border-[var(--line-subtle)] bg-white/55 p-4">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Контур</div>
+        <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+          {role === 'company'
+            ? 'После входа откроются ручная проверка дипломов, API-ключи и лимиты компании.'
+            : role === 'university'
+              ? 'После входа откроются реестр дипломов, импорт файла и ручное создание записей.'
+              : 'После входа будет доступен личный контур аккаунта и статус подключения будущих student-сервисов.'}
+        </p>
+      </div>
     </AuthRoutePanel>
   )
 }
