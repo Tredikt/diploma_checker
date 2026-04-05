@@ -126,7 +126,7 @@ async def client(migrated_database: tuple[str, str]) -> AsyncIterator[AsyncClien
   application = create_app()
   transport = ASGITransport(app=application)
   async with application.router.lifespan_context(application):
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+    async with AsyncClient(transport=transport, base_url="http://test/api/v1") as ac:
       yield ac
 
   _reset_app_singletons()

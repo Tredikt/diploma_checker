@@ -211,7 +211,7 @@ async def test_register_student_after_diploma_created(
 
 async def test_auth_me_requires_bearer(client: AsyncClient) -> None:
   response = await client.get("/auth/me")
-  assert response.status_code == 403
+  assert response.status_code == 401
 
 
 async def test_auth_me_university_profile(

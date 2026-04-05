@@ -107,7 +107,8 @@ class HrVerificationService:
     if not token_snapshot:
       raise AppError(status_code=404, error_code="TOKEN_NOT_FOUND", detail="Token not found")
       
-    expires = token_snapshot.expires_at if token_snapshot.expires_at.tzinfo else token_snapshot.expires_at.replace(tzinfo=UTC)
+    exp = token_snapshot.expires_at
+    expires = exp if exp.tzinfo else exp.replace(tzinfo=UTC)
     if (expires - datetime.now(UTC)).total_seconds() <= 0:
       raise AppError(status_code=404, error_code="TOKEN_NOT_FOUND", detail="Token expired")
 
