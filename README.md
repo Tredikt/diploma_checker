@@ -142,6 +142,60 @@ docker compose up --build
 | API-ключи | ![HR keys](frontend/demo/hr/keys.png) |
 | Лимиты | ![HR limits](frontend/demo/hr/limits.png) |
 
+## Архитектурная схема
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#f4f6f8', 'primaryTextColor': '#333333', 'primaryBorderColor': '#5c6068', 'lineColor': '#4a4a4a', 'tertiaryColor': '#e2e6ea', 'noteBkgColor': '#dcdcdc', 'fontFamily': 'Arial, sans-serif'}}}%%
+graph TD
+    %% Внешние акторы
+    Client_Uni[ВУЗ / Оператор]
+    Client_Student[Студент]
+    Client_HR[HR / Работодатель]
+
+    %% Gateway / Shared слой
+    subgraph App Layer [Единое приложение FastAPI]
+        Router[API Router & Auth Middleware\n Проверка JWT, Token Offloading]
+        
+        %% Модули
+        subgraph Modules [Изолированные бизнес-модули]
+            Mod_Auth[Auth Module\nЛогины, JWT, Лимиты]
+            Mod_Uni[University Module\nЗагрузка CSV, Аннулирование]
+            Mod_Student[Student Module\nПривязка, QR-коды, TTL]
+            Mod_HR[HR Module\nПроверка QR, Поиск по базе]
+        end
+        
+        %% Фоновые процессы
+        Worker[Celery / FastStream Worker\nПарсинг CSV, Хеширование]
+    end
+
+    %% Базы данных и кэш
+    subgraph Data Layer [PostgreSQL & Redis]
+        Schema_Auth[Схема: auth\nПользователи, Ключи, Лимиты]
+        Schema_Core[Схема: core\nДипломы, Токены]
+        Redis[Redis\nRate Limits, Кэш JWKS, Сессии]
+    end
+
+    %% Связи
+    Client_Uni -->|POST /api/v1/uni/...| Router
+    Client_Student -->|GET /api/v1/student/...| Router
+    Client_HR -->|GET /api/v1/hr/...| Router
+
+    Router --> Mod_Auth
+    Router --> Mod_Uni
+    Router --> Mod_Student
+    Router --> Mod_HR
+
+    Mod_Auth -->|Чтение/Запись| Schema_Auth
+    Mod_Uni -->|Запись| Schema_Core
+    Mod_Student -->|Чтение/Запись| Schema_Core
+    Mod_HR -->|Чтение| Schema_Core
+
+    Mod_Uni -.->|Отправка задачи| Worker
+    Worker -->|Батч-инсерт| Schema_Core
+    
+    Router -.->|Проверка лимитов| Redis
+    Mod_HR -.->|Быстрое чтение QR| Redis
+```
+
 ## Команда
 
 - Иван Ткачев - Team Lead
