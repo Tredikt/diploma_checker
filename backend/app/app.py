@@ -8,8 +8,9 @@ from fastapi.openapi.utils import get_openapi
 
 from app.config import get_settings
 from app.modules.auth.routers import router as auth_router
-from app.modules.university.routers import router as university_router
 from app.modules.hr.routers import router as hr_router
+from app.modules.student.routers import router as student_router
+from app.modules.university.routers import router as university_router
 from app.shared.bootstrap import lifespan
 from app.shared.middleware import register_cors_middleware, register_request_context_middleware
 from app.shared.middleware.exceptions import register_exception_handlers
@@ -32,6 +33,7 @@ def create_app() -> FastAPI:
   application.include_router(health_router)
   application.include_router(auth_router, prefix="/api/v1")
   application.include_router(university_router, prefix="/api/v1")
+  application.include_router(student_router, prefix="/api/v1")
   application.include_router(hr_router, prefix="/api/v1")
   application.openapi = _build_custom_openapi(application)
 
