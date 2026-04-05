@@ -45,6 +45,7 @@ class CompanyAccessService:
         key=None,
         is_active=item.is_active,
         created_at=item.created_at,
+        last_used_at=item.last_used_at,
       )
       for item in items
     ]
