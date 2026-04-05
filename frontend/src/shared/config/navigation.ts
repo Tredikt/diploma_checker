@@ -31,10 +31,34 @@ export const navigationItems: NavigationItem[] = [
     to: '/app/university/create',
     role: 'university',
   },
-  { label: 'Проверка', to: '/app/company/verification', role: 'company' },
-  { label: 'API-ключи', to: '/app/company/api-keys', role: 'company' },
-  { label: 'Лимиты', to: '/app/company/limits', role: 'company' },
-  { label: 'Кабинет', to: '/app/student/home', role: 'student' },
+  {
+    label: 'Ручная проверка',
+    shortLabel: 'Проверка',
+    description: 'Поиск диплома по номеру и коду ВУЗа',
+    to: '/app/company/verification',
+    role: 'company',
+  },
+  {
+    label: 'API-ключи',
+    shortLabel: 'Ключи',
+    description: 'Выпуск и отзыв ключей компании',
+    to: '/app/company/api-keys',
+    role: 'company',
+  },
+  {
+    label: 'Лимиты компании',
+    shortLabel: 'Лимиты',
+    description: 'Квоты и текущее использование',
+    to: '/app/company/limits',
+    role: 'company',
+  },
+  {
+    label: 'Студенческий кабинет',
+    shortLabel: 'Кабинет',
+    description: 'Профиль и статус личного контура',
+    to: '/app/student/home',
+    role: 'student',
+  },
 ]
 
 export function getNavigationForRole(role: UserRole | null) {
